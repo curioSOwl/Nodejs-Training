@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
-import Employee from "./Employee";
 
 const dataSource = new DataSource({
   type: "postgres",
@@ -14,7 +13,8 @@ const dataSource = new DataSource({
   synchronize: false,
   logging: true,
   namingStrategy: new SnakeNamingStrategy(),
-  entities: [Employee],
+  entities: ["dist/src/entity/*.js"],
+  migrations: ["dist/src/db/migrations/*.js"],
 });
 
 export default dataSource;
