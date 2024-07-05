@@ -1,17 +1,24 @@
 import { Column, Entity, OneToOne } from "typeorm";
 import AbstractEntity from "./abstract-entity";
 import Address from "./address.entity";
+import { Role } from "../utils/role.enum";
 
 @Entity()
 class Employee extends AbstractEntity {
   @Column()
-  name: String;
+  name: string;
 
   @Column()
-  age: String;
+  age: number;
 
   @Column()
-  email: String;
+  email: string;
+
+  @Column({ nullable: true })
+  password: string;
+
+  @Column({ nullable: true })
+  role: Role;
 
   @OneToOne(() => Address, (address) => address.employee, {
     cascade: true,

@@ -1,23 +1,17 @@
-const express = require("express");
+import express from "express";
 import { Request, Response } from "express";
 import employeeRouter from "./routes/employee.routes";
 import loggerMiddleWare from "./middleware/logger.middleware";
 import bodyParser from "body-parser";
 import dataSource from "./db/data-source.db";
-import HttpException from "../exceptions/http.exceptions";
+import errorMiddleware from "./middleware/error.middleware";
 
-const server = new express();
+const server = express();
 
 server.use(bodyParser.json());
 server.use(loggerMiddleWare);
 server.use("/employees", employeeRouter);
-server.use((err: Error, req, res, next) => {
-  console.error(err.stack);
-  if (err instanceof HttpException) {
-    res.status(err.status).send({ error: err.message, code: err.status });
-  }
-  res.status(500).send({ error: err.message });
-});
+server.use(errorMiddleware);
 
 server.get("/", (req: Request, res: Response) => {
   console.log(req.url);

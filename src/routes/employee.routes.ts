@@ -1,4 +1,3 @@
-import { DataSource } from "typeorm";
 import EmployeeController from "../controller/employee.controller";
 import EmployeeRepository from "../repository/employee.repository";
 import EmployeeService from "../service/employee.service";

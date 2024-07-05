@@ -5,7 +5,7 @@ class EmployeeRepository {
   constructor(private repository: Repository<Employee>) {}
 
   find = async (): Promise<Employee[]> => {
-    return this.repository.find();
+    return this.repository.find({ relations: ["address"] });
   };
 
   findOneBy = async (filter: Partial<Employee>): Promise<Employee> => {
@@ -28,8 +28,8 @@ class EmployeeRepository {
     await this.repository.delete({ id });
   };
 
-  softRemove = async (employee: Employee): Promise<void> => {
-    await this.repository.softRemove(employee);
+  softRemove = async (filter: Partial<Employee>): Promise<void> => {
+    await this.repository.softRemove(filter);
   };
 }
 
