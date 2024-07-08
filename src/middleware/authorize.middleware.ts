@@ -11,7 +11,7 @@ const authorize = async (
 ) => {
   try {
     const token = getTokenFromRequestHeader(req);
-    
+
     const payload = jsonwebtoken.verify(token, JWT_SECRET);
 
     req.name = (payload as jwtPayload).name;
@@ -26,7 +26,8 @@ const authorize = async (
 
 const getTokenFromRequestHeader = (req: RequestWithUser) => {
   const bearerToken = req.header("Authorization");
-  return bearerToken;
+  const token = bearerToken.replace("Bearer ", "");
+  return token;
 };
 
 export default authorize;
