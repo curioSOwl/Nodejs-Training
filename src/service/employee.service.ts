@@ -8,11 +8,12 @@ import jsonwebtoken from "jsonwebtoken";
 import { JWT_SECRET, JWT_VALIDITY } from "../utils/constants";
 import { jwtPayload } from "../utils/jwtPayload";
 import DepartmentRepository from "../repository/department.repository";
+import DepartmentService from "./department.service";
 
 class EmployeeService {
   constructor(
     private employeeRepository: EmployeeRepository,
-    private departmentRepository: DepartmentRepository
+    private departmentService: DepartmentService
   ) {}
 
   getAllEmployees = async (): Promise<Employee[]> => {
@@ -63,9 +64,10 @@ class EmployeeService {
     }
 
     const newEmployee = new Employee();
-    const department = await this.departmentRepository.findOneBy({
-      name: departmentname,
-    });
+    const department = await this.departmentService.getDepartmentByName(name);
+    if(!department){
+      throw new HttpException(400,"DEPARTMENT NOT GIVEN");
+    }
     newEmployee.email = email;
     newEmployee.name = name;
     newEmployee.age = age;
@@ -88,9 +90,7 @@ class EmployeeService {
     departmentname: string
   ): Promise<Employee> => {
     const newEmployee = await this.getEmployeeById(id);
-    const department = await this.departmentRepository.findOneBy({
-      name: departmentname,
-    });
+    const department = await this.departmentService.getDepartmentByName(name);
     newEmployee.email = email;
     newEmployee.name = name;
     newEmployee.department = department;

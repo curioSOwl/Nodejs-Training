@@ -9,10 +9,6 @@ const errorMiddleware = (
 ) => {
   try {
     if (error instanceof HttpException) {
-      // const status: number = error.status || 500;
-      // const message: string = error.message || "Something went wrong";
-      // let respbody = { message: message };
-      // res.status(status).json(respbody);
       const errorObject = {
         error: error.message,
         statusCode: error.status,

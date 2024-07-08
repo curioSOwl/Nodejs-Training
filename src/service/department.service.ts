@@ -12,6 +12,9 @@ class DepartmentService {
   getDepartmentById = async (id: number): Promise<Department> => {
     return this.departmentRepository.findOneBy({ id });
   };
+  getDepartmentByName = async (name: string): Promise<Department> => {
+    return this.departmentRepository.findOneBy({ name });
+  };
 
   createDepartment = async (name: string): Promise<Department> => {
     const newDepartment = new Department();

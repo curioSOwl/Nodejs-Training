@@ -65,7 +65,7 @@ class DepartmentController {
         throw error;
       }
 
-      res.status(200).send(department.name);
+      res.status(200).send(department);
     } catch (err) {
       next(err);
     }

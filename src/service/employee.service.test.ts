@@ -10,6 +10,7 @@ import Address from "../entity/address.entity";
 describe("Employee service", () => {
   let employeeRepository: EmployeeRepository;
   let employeeService: EmployeeService;
+  let departmentService: DepartmentService;
   let departmentRepository: DepartmentRepository;
   let addressTestCase: Address[];
   let employeeTestCase: Employee[];
@@ -30,7 +31,7 @@ describe("Employee service", () => {
 
     employeeService = new EmployeeService(
       employeeRepository,
-      departmentRepository
+      new DepartmentService(departmentRepository)
     );
 
     addressTestCase = [
