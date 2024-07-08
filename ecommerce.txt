@@ -1,0 +1,125 @@
+create table user_details(
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(255) not null,
+	address_id int,
+	phone_number varchar(255),
+	email varchar(255),
+	password varchar(255),
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	constraint fk1
+ 	foreign key (address_id) references address(aid)
+);
+
+create table address(
+	aid serial primary key,
+	addressName varchar(255),
+	place varchar(255),
+	pincode varchar(255)
+	
+);
+
+create table product_category(
+	pcid serial primary key,
+	pcname varchar(255) not null
+	
+);
+
+create table product_details(
+	pid serial primary key,
+	pname varchar(255) not null,
+	description varchar(255),
+	price int,
+	sku varchar(255),
+	pcid int,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	constraint fk2
+ 	foreign key (pcid) references product_category(pcid)
+	
+);
+
+
+
+create table orders (
+	orderid serial primary key,
+	user_id int,
+	order_address int,
+	order_status varchar(255),
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	constraint fk3
+ 	foreign key (order_address) references address(aid),
+	constraint fk4
+ 	foreign key (user_id) references user_details(id)
+);
+
+
+create table order_items(
+	order_item_id serial primary key,
+	order_id int,
+	product_id int,
+	quantity int,
+	price int,
+	reated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,	
+	constraint fk5
+ 	foreign key (order_id) references orders(orderid),
+ 	constraint fk3
+ 	foreign key (product_id) references product_details(pid)
+	
+	
+);
+
+
+INSERT INTO address (addressName, place, pincode)
+VALUES 
+('abc', 'New York', '20067'),
+('def', 'Canada', '23456'),
+('ghi', 'London', '67543');
+
+INSERT INTO user_details (name, address_id, phone_number, email, password)
+VALUES 
+('John', 1, '7654908756', 'john@gmail.com', '123'),
+('Alice', 2, '4389764589', 'alice@gmail.com', '456'),
+('George', 3, '9897634512', 'george@gmail.com', '789');
+
+INSERT INTO product_category (pcname)
+VALUES 
+('Electronics'),
+('Clothing'),
+('HomeDecor'),
+('Sports'),
+('Toys');
+
+INSERT INTO product_details (pname, description, price, sku, pcid)
+VALUES 
+('iPhone', '16 Pro max', 999, 'abc', 1),
+('T-Shirt', 'Versace', 20, 'def', 2),
+('Biscuit', 'Oreo', 200, 'hijk', 3),
+('Basketball', 'Addidas', 50, 'lmnop', 4),
+('Footwear', 'Valenciaga', 30, 'qrst', 5);
+
+INSERT INTO orders (user_id, order_address, order_status)
+VALUES 
+(1, 1, 'pending'),
+(1, 1, 'shipped'),
+(2, 2, 'pending'),
+(3, 3, 'delivered'),
+(1, 1, 'cancelled');
+
+INSERT INTO order_items (order_id, product_id, quantity, price)
+VALUES 
+(1, 1, 1, 999),
+(2, 2, 2, 40),
+(3, 3, 1, 200),
+(4, 4, 1, 50),
+(5, 5, 2, 60);
+
+
+CREATE INDEX idx_user_email ON user_details (email);
+CREATE INDEX idx_product_sku ON product_details (sku);
+CREATE INDEX idx_order_user_id ON orders (user_id);
+CREATE INDEX idx_order_item_order_id ON order_items (order_id);
+CREATE INDEX idx_order_item_product_id ON order_items (product_id);
+
