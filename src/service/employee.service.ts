@@ -7,9 +7,13 @@ import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import { JWT_SECRET, JWT_VALIDITY } from "../utils/constants";
 import { jwtPayload } from "../utils/jwtPayload";
+import DepartmentRepository from "../repository/department.repository";
 
 class EmployeeService {
-  constructor(private employeeRepository: EmployeeRepository) {}
+  constructor(
+    private employeeRepository: EmployeeRepository,
+    private departmentRepository: DepartmentRepository
+  ) {}
 
   getAllEmployees = async (): Promise<Employee[]> => {
     return this.employeeRepository.find();
@@ -50,7 +54,8 @@ class EmployeeService {
     age: number,
     password: string,
     role: Role,
-    address: any
+    address: any,
+    departmentname: string
   ): Promise<Employee> => {
     const emailFormat = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     if (!email.match(emailFormat)) {
@@ -58,6 +63,9 @@ class EmployeeService {
     }
 
     const newEmployee = new Employee();
+    const department = await this.departmentRepository.findOneBy({
+      name: departmentname,
+    });
     newEmployee.email = email;
     newEmployee.name = name;
     newEmployee.age = age;
@@ -68,6 +76,7 @@ class EmployeeService {
     newAddress.pincode = address.pincode;
 
     newEmployee.address = newAddress;
+    newEmployee.department = department;
 
     return this.employeeRepository.save(newEmployee);
   };
@@ -75,11 +84,16 @@ class EmployeeService {
   updateEmployee = async (
     id: number,
     name: string,
-    email: string
+    email: string,
+    departmentname: string
   ): Promise<Employee> => {
     const newEmployee = await this.getEmployeeById(id);
+    const department = await this.departmentRepository.findOneBy({
+      name: departmentname,
+    });
     newEmployee.email = email;
     newEmployee.name = name;
+    newEmployee.department = department;
     return this.employeeRepository.save(newEmployee);
   };
 

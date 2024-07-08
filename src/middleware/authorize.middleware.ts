@@ -11,6 +11,7 @@ const authorize = async (
 ) => {
   try {
     const token = getTokenFromRequestHeader(req);
+    
     const payload = jsonwebtoken.verify(token, JWT_SECRET);
 
     req.name = (payload as jwtPayload).name;

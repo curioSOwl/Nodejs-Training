@@ -38,6 +38,10 @@ export class CreateEmployeeDto {
   @IsNotEmpty()
   @IsEnum(Role)
   role: Role;
+
+  @IsNotEmpty()
+  @IsString()
+  department: string;
 }
 
 export class UpdateEmployeeDto {

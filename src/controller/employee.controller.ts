@@ -14,28 +14,43 @@ class EmployeeController {
   constructor(private employeeService: EmployeeService) {
     this.router = express.Router();
 
-    this.router.get("/", this.getAllEmployees);
-    this.router.get("/:id", this.getEmployeeById);
+    this.router.get("/", authorize, this.getAllEmployees);
+    this.router.get("/:id", authorize, this.getEmployeeById);
     this.router.post("/login", this.loginEmployee);
-    this.router.put("/:id", this.updateEmployee);
-    this.router.delete("/:id", this.deleteEmployee);
+    this.router.put("/:id", authorize, this.updateEmployee);
+    this.router.delete("/:id", authorize, this.deleteEmployee);
     this.router.post("/", authorize, this.createEmployee);
   }
 
   public getAllEmployees = async (
-    req: express.Request,
-    res: express.Response
-  ) => {
-    const employees = await this.employeeService.getAllEmployees();
-    res.status(200).send(employees);
-  };
-
-  public getEmployeeById = async (
-    req: express.Request,
+    req: RequestWithUser,
     res: express.Response,
     next: express.NextFunction
   ) => {
     try {
+      const role = req.role;
+
+      if (!role) {
+        throw new HttpException(400, "validation error");
+      }
+      const employees = await this.employeeService.getAllEmployees();
+      res.status(200).send(employees);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  public getEmployeeById = async (
+    req: RequestWithUser,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    try {
+      const role = req.role;
+
+      if (!role) {
+        throw new HttpException(400, "validation error");
+      }
       const employee = await this.employeeService.getEmployeeById(
         Number(req.params.id)
       );
@@ -48,14 +63,14 @@ class EmployeeController {
         throw error;
       }
 
-      res.status(200).send(employee.name);
+      res.status(200).send(employee);
     } catch (err) {
       next(err);
     }
   };
 
   public loginEmployee = async (
-    req: RequestWithUser,
+    req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) => {
@@ -74,10 +89,9 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
+      const role = req.role;
 
-      const role=req.role;
-
-      if(role !== Role.HR){
+      if (role !== Role.HR) {
         throw new HttpException(400, "validation error");
       }
       const employeeDto = plainToInstance(CreateEmployeeDto, req.body);
@@ -94,7 +108,8 @@ class EmployeeController {
         employeeDto.age,
         employeeDto.password,
         employeeDto.role,
-        employeeDto.address
+        employeeDto.address,
+        employeeDto.department
       );
       res.status(200).send(employees);
     } catch (err) {
@@ -103,11 +118,16 @@ class EmployeeController {
   };
 
   public updateEmployee = async (
-    req: express.Request,
+    req: RequestWithUser,
     res: express.Response,
     next: express.NextFunction
   ) => {
     try {
+      const role = req.role;
+
+      if (role !== Role.HR) {
+        throw new HttpException(400, "validation error");
+      }
       const employeeDto = plainToInstance(UpdateEmployeeDto, req.body);
       const errors = await validate(employeeDto);
 
@@ -117,7 +137,8 @@ class EmployeeController {
       const employees = await this.employeeService.updateEmployee(
         Number(req.params.id),
         req.body.name,
-        req.body.email
+        req.body.email,
+        req.body.department
       );
       res.status(200).send(employees);
     } catch (err) {
@@ -126,13 +147,18 @@ class EmployeeController {
   };
 
   public deleteEmployee = async (
-    req: express.Request,
+    req: RequestWithUser,
     res: express.Response,
     next: express.NextFunction
   ) => {
     try {
-      const employeeID = Number(req.params.employeeID);
-      if (!Number.isInteger(employeeID)) {
+      const role = req.role;
+
+      if (role !== Role.HR) {
+        throw new HttpException(400, "validation error");
+      }
+      const employeeID = Number(req.params.id);
+      if (!employeeID) {
         throw new HttpException(400, "ID is not an integer");
       }
       const employees = await this.employeeService.delete(

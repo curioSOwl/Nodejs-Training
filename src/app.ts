@@ -5,12 +5,14 @@ import loggerMiddleWare from "./middleware/logger.middleware";
 import bodyParser from "body-parser";
 import dataSource from "./db/data-source.db";
 import errorMiddleware from "./middleware/error.middleware";
+import departmentRouter from "./routes/department.routes";
 
 const server = express();
 
 server.use(bodyParser.json());
 server.use(loggerMiddleWare);
 server.use("/employees", employeeRouter);
+server.use("/department", departmentRouter);
 server.use(errorMiddleware);
 
 server.get("/", (req: Request, res: Response) => {

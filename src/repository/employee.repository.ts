@@ -5,12 +5,17 @@ class EmployeeRepository {
   constructor(private repository: Repository<Employee>) {}
 
   find = async (): Promise<Employee[]> => {
-    return this.repository.find({ relations: ["address"] });
+    return this.repository.find({
+      relations: { address: true, department: true },
+    });
   };
 
   findOneBy = async (filter: Partial<Employee>): Promise<Employee> => {
     // const employeeRepository = this.dataSource.getRepository(Employee);
-    return this.repository.findOne({ where: filter, relations: ["address"] });
+    return this.repository.findOne({
+      where: filter,
+      relations: { address: true, department: true },
+    });
   };
 
   save = async (newEmployee: Employee): Promise<Employee> => {
